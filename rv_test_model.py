@@ -44,7 +44,7 @@ action_map = {-1:'not_sure', 0:'straight', 1:'slow_or_stop',
                         4:'turn_left_slight', 5:'turn_right_slight'}
 
 
-fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync.csv", 'wb')
+fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync_full.csv", 'wb')
 writer = csv.writer(fid, delimiter=',')
 
 csv_header = ('img_idx', 'vf (m/s)', 'af (m/s^2)', 'wz (deg/s)', 'res0', 'res1', 'res2', 'res3', 'res4', 'res5')
@@ -70,6 +70,7 @@ local_k = []
 #for k in range(noFrames):
 
 for k in range(noFrames):
+	#print("--> processing img: {:05d}/{:05d}".format(k, noFrames))
 	img = np.array(next(iter_cam2))
 	img_crop = imresize(rv_imgCropCenter(img, model_input_w, model_input_h), (IMSZ, IMSZ))
 	local_oxts = next(iter_oxts)
@@ -94,6 +95,18 @@ for k in range(noFrames):
 		batch_oxts = []
 		local_k = []
 		batch_idx = batch_idx+ 1
+
+if len(local_k) > 0:
+	for j in range(batch_size - len(local_k)):
+		batch_img.append(np.zeros((win_size, IMSZ, IMSZ, 3), dtype=np.uint8))
+	res_aux = a.observe_batch(np.stack(batch_img))
+	res_aux = np.reshape(res_aux, (batch_size, win_size, res_aux.shape[1]))
+	res = res_aux[:, -1, :]
+	for idx in range(len(local_k)):
+			local_row = create_local_row_kitti(local_k[idx], batch_oxts[idx], res[idx, :])
+			print("----> processing batch: {:05d}/{:05f}".format(batch_idx, np.floor(noFrames/batch_size)) + \
+				" ==> result: ", local_row)
+			writer.writerow(local_row)
 
 fid.close()
 

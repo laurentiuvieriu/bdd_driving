@@ -25,11 +25,6 @@ rect_center_x = 240
 model_input_w = 640
 model_input_h = 360
 
-# cvfont_thickness = 1
-# batch_size = 32
-# win_size = 20
-# IMSZ = 228
-
 noFrames = dataset.__len__()
 
 fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync_full.csv", "rb")
@@ -75,8 +70,6 @@ for k in range(noFrames):
     local_res = all_labs[k]
     labels = [float(item) for item in local_res]
     cv2.putText(img_crop, "velocity fwd (vf)...................... {:02.2f}".format(local_res[1]), (10,next(row_pos)), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
-#     cv2.putText(img_crop, "acceleration fwd (af).................. {:02.2f}".format(local_res[1]), (10,next(row_pos)), font, font_size, (0,0,255), font_thickness, cv2.LINE_AA)
-#     cv2.putText(img_crop, "angular rate around z (wz)............. {:02.2f}".format((local_res[2])*180/np.pi), (10,next(row_pos)), font, font_size, (0,0,255), font_thickness, cv2.LINE_AA)
     # deal with acceleration
     accel_mag_gt = int(np.round(local_res[2]/lab_range[2]*rect_max))
     plot_bar_on_img(img_crop, accel_mag_gt, rect_center_x, next(row_pos), rect_width, 'accel_gt:', font, font_size, font_thickness)

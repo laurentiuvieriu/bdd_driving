@@ -83,10 +83,10 @@ for k in range(noFrames):
     
     row_pos_local = next(row_pos)
     fwd_pred = int(np.round(local_res[4]/lab_range[4]*rect_max))
-    plot_bar_on_img(img_crop, fwd_pred, rect_center_x, row_pos_local, rect_width, 'fwd/slow:', font, font_size, font_thickness)
+    plot_bar_on_img(img_crop, fwd_pred, rect_center_x, row_pos_local, rect_width, 'fwd/slow_pred:', font, font_size, font_thickness)
 
     slow_pred = -int(np.round(local_res[5]/lab_range[5]*rect_max))
-    plot_bar_on_img(img_crop, slow_pred, rect_center_x, row_pos_local, rect_width, 'fwd/slow:', font, font_size, font_thickness)
+    plot_bar_on_img(img_crop, slow_pred, rect_center_x, row_pos_local, rect_width, 'fwd/slow_pred:', font, font_size, font_thickness)
     
     # deal with steering
     lr_mag_gt = -int(np.round(local_res[3]/lab_range[3]*rect_max))
@@ -102,15 +102,15 @@ for k in range(noFrames):
     # deal with slight_steering    
     row_pos_local = next(row_pos)
     slight_left_pred = -int(np.round(local_res[8]/lab_range[8]*rect_max))
-    plot_bar_on_img(img_crop, slight_left_pred, rect_center_x, row_pos_local, rect_width, 'left/right_pred:', font, font_size, font_thickness)
+    plot_bar_on_img(img_crop, slight_left_pred, rect_center_x, row_pos_local, rect_width, 'slight left/right_pred:', font, font_size, font_thickness)
 
     slight_right_pred = int(np.round(local_res[9]/lab_range[8]*rect_max))
-    plot_bar_on_img(img_crop, slight_right_pred, rect_center_x, row_pos_local, rect_width, 'shight left/right_pred:', font, font_size, font_thickness)
+    plot_bar_on_img(img_crop, slight_right_pred, rect_center_x, row_pos_local, rect_width, 'slight left/right_pred:', font, font_size, font_thickness)
     
     cv2.imshow('image', img_crop)
     cv2.moveWindow('image', 2500, 360)
     cv2.waitKey(30)
-#     cv2.imwrite(targetDir+"/" + date + "_drive_" + drive + "_sync_full/frame_{:010d}.png".format(k), img_crop)
+    cv2.imwrite(targetDir+"/" + date + "_drive_" + drive + "_sync_full/frame_{:010d}.png".format(k), img_crop)
 
 # line = next(reader)
 

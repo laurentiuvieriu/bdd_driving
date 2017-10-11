@@ -2,3 +2,4 @@
 *.bestmodel
 *.bin
 *.pyc
+*.csv

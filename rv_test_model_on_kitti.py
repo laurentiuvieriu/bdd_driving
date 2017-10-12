@@ -1,5 +1,6 @@
 ## unzip kitti one archive at a time, compute the predictions and delete the images after that
-## this approach should limit the space requirements as much as possible_hull
+## this approach should limit the space requirements as much as possible
+## csv files with results can be found in <projDir>/kitti/fcn_lstm
 
 import os
 from rv_utils import rv_fcn_lstm_kitti
@@ -8,6 +9,8 @@ projDir = '/media/radu/data/python/bdd_driving'
 
 fileList = [f for f in os.listdir(datasetDir) if f.endswith('sync.zip')]
 print("--> found: {:03} files".format(len(fileList)))
+
+model = rv_fcn_lstm_kitti(datasetDir, projDir)
 
 for k in range(len(fileList)):
 	comm = []
@@ -19,7 +22,6 @@ for k in range(len(fileList)):
 	date = fileList[k][0:10]
 	drive = fileList[k][17:21]
 
-	model = rv_fcn_lstm_kitti(datasetDir, projDir)
 	model.process_KittiSequence(date, drive)
 
 	comm.append("rm -rf {:}/{:}/{:}".format(datasetDir, date, fileList[k][0:-4]))

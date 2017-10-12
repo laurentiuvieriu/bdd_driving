@@ -46,6 +46,7 @@ max_stretch.append(np.abs(lab_max))
 max_stretch.append(np.abs(lab_min))
 max_stretch = np.stack(max_stretch)
 lab_range = max_stretch.max(0)
+lab_range[-6:]= 1
 
 iter_cam2 = iter(dataset.cam2)
 
@@ -72,33 +73,43 @@ for k in range(noFrames):
     cv2.putText(img_crop, "velocity fwd (vf)...................... {:02.2f}".format(local_res[1]), (10,next(row_pos)), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
     # deal with acceleration
     accel_mag_gt = int(np.round(local_res[2]/lab_range[2]*rect_max))
-    plot_bar_on_img(img_crop, accel_mag_gt, rect_center_x, next(row_pos), rect_width, 'accel_gt:', font, font_size, font_thickness)
+    y_pos = next(row_pos)
+    plot_bar_on_img(img_crop, accel_mag_gt, rect_center_x, y_pos, rect_width, 'accel_gt:', font, font_size, font_thickness)
+    cv2.putText(img_crop, "{:.2f}".format(local_res[2]), (280, y_pos), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
     
     row_pos_local = next(row_pos)
     fwd_pred = int(np.round(local_res[4]/lab_range[4]*rect_max))
     plot_bar_on_img(img_crop, fwd_pred, rect_center_x, row_pos_local, rect_width, 'fwd/slow_pred:', font, font_size, font_thickness)
-
+    cv2.putText(img_crop, "{:.2f}".format(local_res[4]), (320, row_pos_local), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
+    
     slow_pred = -int(np.round(local_res[5]/lab_range[5]*rect_max))
     plot_bar_on_img(img_crop, slow_pred, rect_center_x, row_pos_local, rect_width, 'fwd/slow_pred:', font, font_size, font_thickness)
+    cv2.putText(img_crop, "{:.2f}".format(local_res[5]), (280, row_pos_local), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
     
     # deal with steering
     lr_mag_gt = -int(np.round(local_res[3]/lab_range[3]*rect_max))
-    plot_bar_on_img(img_crop, lr_mag_gt, rect_center_x, next(row_pos), rect_width, 'left/right_gt:', font, font_size, font_thickness)
+    y_pos = next(row_pos)
+    plot_bar_on_img(img_crop, lr_mag_gt, rect_center_x, y_pos, rect_width, 'left/right_gt:', font, font_size, font_thickness)
+    cv2.putText(img_crop, "{:.2f}".format(local_res[3]), (280, y_pos), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
     
     row_pos_local = next(row_pos)
     left_pred = -int(np.round(local_res[6]/lab_range[6]*rect_max))
     plot_bar_on_img(img_crop, left_pred, rect_center_x, row_pos_local, rect_width, 'left/right_pred:', font, font_size, font_thickness)
-
+    cv2.putText(img_crop, "{:.2f}".format(local_res[6]), (280, row_pos_local), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
+    
     right_pred = int(np.round(local_res[7]/lab_range[7]*rect_max))
     plot_bar_on_img(img_crop, right_pred, rect_center_x, row_pos_local, rect_width, 'left/right_pred:', font, font_size, font_thickness)
+    cv2.putText(img_crop, "{:.2f}".format(local_res[7]), (320, row_pos_local), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
     
     # deal with slight_steering    
     row_pos_local = next(row_pos)
     slight_left_pred = -int(np.round(local_res[8]/lab_range[8]*rect_max))
     plot_bar_on_img(img_crop, slight_left_pred, rect_center_x, row_pos_local, rect_width, 'slight left/right_pred:', font, font_size, font_thickness)
-
-    slight_right_pred = int(np.round(local_res[9]/lab_range[8]*rect_max))
+    cv2.putText(img_crop, "{:.2f}".format(local_res[8]), (280, row_pos_local), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
+    
+    slight_right_pred = int(np.round(local_res[9]/lab_range[9]*rect_max))
     plot_bar_on_img(img_crop, slight_right_pred, rect_center_x, row_pos_local, rect_width, 'slight left/right_pred:', font, font_size, font_thickness)
+    cv2.putText(img_crop, "{:.2f}".format(local_res[9]), (320, row_pos_local), font, font_size, (0,255,0), font_thickness, cv2.LINE_AA)
     
     cv2.imshow('image', img_crop)
     cv2.moveWindow('image', 2500, 360)

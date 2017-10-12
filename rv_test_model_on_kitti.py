@@ -8,7 +8,7 @@ datasetDir = '/media/radu/data/datasets/Kitti'
 projDir = '/media/radu/data/python/bdd_driving'
 
 fileList = [f for f in os.listdir(datasetDir) if f.endswith('sync.zip')]
-print("--> found: {:03} files".format(len(fileList)))
+print("--> looking for zip files in {:} - found: {:03} files".format(datasetDir, len(fileList)))
 
 model = rv_fcn_lstm_kitti(datasetDir, projDir)
 

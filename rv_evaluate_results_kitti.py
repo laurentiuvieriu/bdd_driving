@@ -17,59 +17,79 @@
 ## here, we compute a frame discrete label, giving priority (as suggested) to turning actions (left, right), then addressing \
 # the remaining cases for fixing "straight" and "slow or stop" labels
 
+import os
 import numpy as np
 import csv
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-targetDir = '/media/radu/data/python/bdd_driving/results/kitti/fcn_lstm'
+resultsDir = '/media/radu/data/python/bdd_driving/results/kitti/fcn_lstm'
 # Specify the dataset to load
 date = '2011_09_26'
-drive = '0101'
 
-fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync_full.csv", "rb")
-reader = csv.reader(fid, delimiter=',')
+files = [f for f in os.listdir(resultsDir) if f.endswith('full.csv')]
+print("--> found {:d} results files".format(len(files)))
 
-# csv_header = ('img_idx', 'vf (m/s)', 'af (m/s^2)', 'wz (deg/s)', 'res0', 'res1', 'res2', 'res3', 'res4', 'res5')
-# action_map = {-1:'not_sure', 0:'straight', 1:'slow_or_stop',
-#                         2:'turn_left', 3:'turn_right',
-#                         4:'turn_left_slight', 5:'turn_right_slight'}
+all_drives = [item[17:21] for item in files]
 
-# action mapping:
-#    straight.......... 0
-#    slow or stop...... 1
-#    turn_left......... 2
-#    turn_right........ 3
-#    turn_left_slight.. 2
-#    turn_right_slight..3
+def get_labelsFromFile(date, drive):
+	fid = open(resultsDir + "/" + date + "_drive_" + drive + "_sync_full.csv", "rb")
+	reader = csv.reader(fid, delimiter=',')
+	# csv_header = ('img_idx', 'vf (m/s)', 'af (m/s^2)', 'wz (deg/s)', 'res0', 'res1', 'res2', 'res3', 'res4', 'res5')
+	# action_map = {-1:'not_sure', 0:'straight', 1:'slow_or_stop',
+	#                         2:'turn_left', 3:'turn_right',
+	#                         4:'turn_left_slight', 5:'turn_right_slight'}
+	# action mapping:
+	#    straight.......... 0
+	#    slow or stop...... 1
+	#    turn_left......... 2
+	#    turn_right........ 3
+	#    turn_left_slight.. 2
+	#    turn_right_slight..3
+	csv_header = next(reader)
+	action_gt = []
+	action_pred = []
+	for row in reader:
+		local_vals = [float(item) for item in row]
+		if local_vals[3] > 1.0:
+		    action_gt.append(2)
+		elif local_vals[3] < -1.0:
+		    action_gt.append(3)
+		else:
+		    if (local_vals[1] < 2.0) or (local_vals[2] < -1.0):
+		        action_gt.append(1)
+		    else:
+		        action_gt.append(0)
+		amax_pred = np.argmax(local_vals[-6:])
+		if amax_pred >= 4:
+		    action_pred.append(amax_pred - 2)
+		else:
+		    action_pred.append(amax_pred)
+	
+	action_gt_fin = np.asarray(action_gt[1:])
+	action_pred_fin = np.asarray(action_pred[0:-1])	
+	return [action_gt_fin, action_pred_fin]
 
-csv_header = next(reader)
-action_gt = []
-action_pred = []
-for row in reader:
-    local_vals = [float(item) for item in row]
-    if local_vals[3] > 1.0:
-        action_gt.append(2)
-    elif local_vals[3] < -1.0:
-        action_gt.append(3)
-    else:
-        if (local_vals[1] < 2.0) or (local_vals[2] < -1.0):
-            action_gt.append(1)
-        else:
-            action_gt.append(0)
-    amax_pred = np.argmax(local_vals[-6:])
-    if amax_pred >= 4:
-        action_pred.append(amax_pred - 2)
-    else:
-        action_pred.append(amax_pred)
+all_acc = []
+all_labs_gt = []
+all_labs_pred = []
+for drive in all_drives:
+	labs = get_labelsFromFile(date, drive)
+	all_labs_gt.append(labs[0])
+	all_labs_pred.append(labs[1])
+	all_acc.append(accuracy_score(labs[0], labs[1]))
+	print("--> accuracy on {:}_drive{:}: {:3.3f}".format(date, drive, accuracy_score(labs[0], labs[1])))
 
-action_gt_fin = np.asarray(action_gt[1:])
-action_pred_fin = np.asarray(action_pred[0:-1])
 
-print("--> accuracy on {:}_drive{:}: {:3.3f}".format(date, drive, accuracy_score(action_gt_fin, action_pred_fin)))
-cm = confusion_matrix(action_gt_fin, action_pred_fin)
-cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-print("--> confusion matrix...")
-print(cm)
+print("---> avg seq-level accuracy: {:.2f}".format(np.mean(np.stack(all_acc))))
+print("---> avg frame-level accuracy: {:.2f}".format(accuracy_score(np.hstack(all_labs_gt), np.hstack(all_labs_pred))))
+
+
+#cm = confusion_matrix(labs[0], labs[1])
+#cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+#print("--> confusion matrix...")
+#print(cm)
+
+
 
 
 

@@ -21,10 +21,10 @@ import numpy as np
 import csv
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-targetDir = '/media/radu/sdb_data/radu/work/python/bdd_driving/results/kitti'
+targetDir = '/media/radu/data/python/bdd_driving/results/kitti/fcn_lstm'
 # Specify the dataset to load
 date = '2011_09_26'
-drive = '0029'
+drive = '0101'
 
 fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync_full.csv", "rb")
 reader = csv.reader(fid, delimiter=',')

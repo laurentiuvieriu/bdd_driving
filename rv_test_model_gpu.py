@@ -18,7 +18,7 @@ targetDir = '/media/radu/data/python/bdd_driving/results/kitti'
 
 # Specify the dataset to load
 date = '2011_09_26'
-drive = '0029'
+drive = '0101'
 dataset = pykitti.raw(basedir, date, drive, imformat='cv2')
 cvfont = cv2.FONT_HERSHEY_SIMPLEX
 cvfont_size = 0.5

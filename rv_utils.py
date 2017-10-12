@@ -39,7 +39,7 @@ def create_local_row_kitti(local_k, local_oxts, res):
 class rv_fcn_lstm_kitti:
     def __init__(self, baseDir, projDir, batchSize = 32, winSize = 20, imSize = 228, modelInputW = 640, modelInputH = 360):
         self.baseDir = baseDir
-        self.targetDir = projDir + "/results/kitti"
+        self.targetDir = projDir + "/results/kitti/fcn_lstm"
         self.batchSize = batchSize
         self.winSize = winSize
         self.imSize = imSize

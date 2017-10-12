@@ -3,29 +3,29 @@
 
 import os
 from rv_utils import rv_fcn_lstm_kitti
-datasetDir = '/media/radu/sdb_data/radu/work/datasets/Kitti'
-projDir = '/media/radu/sdb_data/radu/work/python/bdd_driving'
+datasetDir = '/media/radu/data/datasets/Kitti'
+projDir = '/media/radu/data/python/bdd_driving'
 
 fileList = [f for f in os.listdir(datasetDir) if f.endswith('sync.zip')]
 print("--> found: {:03} files".format(len(fileList)))
 
-k = 1
-comm = []
-comm.append("unzip -oq {:}/{:} -d {:}/".format(datasetDir, fileList[k], datasetDir))
-print("--> executing: {:}".format(comm[-1]))
-os.system(comm[-1])
-print("--> done... now running the model ...")
+for k in range(len(fileList)):
+	comm = []
+	comm.append("unzip -oq {:}/{:} -d {:}/".format(datasetDir, fileList[k], datasetDir))
+	print("--> executing: {:}".format(comm[-1]))
+	os.system(comm[-1])
+	print("--> done... now running the model ...")
 
-date = fileList[k][0:10]
-drive = fileList[k][17:21]
+	date = fileList[k][0:10]
+	drive = fileList[k][17:21]
 
-model = rv_fcn_lstm_kitti(datasetDir, projDir)
-model.process_KittiSequence(date, drive)
+	model = rv_fcn_lstm_kitti(datasetDir, projDir)
+	model.process_KittiSequence(date, drive)
 
-comm.append("rm -rf {:}/{:}/{:}".format(datasetDir, date, fileList[k][0:-4]))
-print("--> executing: {:}".format(comm[-1]))
-os.system(comm[-1])
-print("--> done")
+	comm.append("rm -rf {:}/{:}/{:}".format(datasetDir, date, fileList[k][0:-4]))
+	print("--> executing: {:}".format(comm[-1]))
+	os.system(comm[-1])
+	print("--> done")
 
 # comm.append("/home/radu/local/tensorflow_011/bin/python rv_evaluate_results_kitti.py")
 # print("--> executing: {:}".format(comm[-1]))

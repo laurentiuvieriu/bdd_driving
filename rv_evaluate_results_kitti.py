@@ -9,18 +9,17 @@
 
 # "We first consider the discrete action case, in which we define four actions: straight, stop, left turn, right turn. \
 # The task is defined as predicting the feasible actions in the next 1/3 of a second. Specifically, we have as ground \
-# truth the vehicle’s speed and its angular velocity between the cur- rent frame and the frame immediately following. \
-# We define the action turning right as the event of an angular speed larger than 1.0◦/s and turning left as an angular \
-# speed less than −1.0◦/s. Otherwise, if the vehicle’s speed is less than 2.0m/s or the acceleration is less than −1.0m/s2, \
-# we de- fine the action stop or slow. The stop or slow action aims to describe when the car has to act in order to avoid, \
-# for instance, a crash or a violation of traffic rules. In all other cases, the car’s action is defined as go straight."
+# truth the vehicles speed and its angular velocity between the current frame and the frame immediately following. \
+# We define the action turning right as the event of an angular speed larger than 1.0deg/s and turning left as an angular \
+# speed less than -1.0deg/s. Otherwise, if the vehicles speed is less than 2.0m/s or the acceleration is less than -1.0m/s2, \
+# we define the action stop or slow. In all other cases -> go straight
 
 ## here, we compute a frame discrete label, giving priority (as suggested) to turning actions (left, right), then addressing \
 # the remaining cases for fixing "straight" and "slow or stop" labels
 
 import numpy as np
 import csv
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 
 targetDir = '/media/radu/data/python/bdd_driving/results/kitti'
@@ -50,15 +49,15 @@ action_pred = []
 for row in reader:
     local_vals = [float(item) for item in row]
     if local_vals[3] > 1.0:
-        action_gt.append(3)
-    elif local_vals[3] < -1.0:
         action_gt.append(2)
+    elif local_vals[3] < -1.0:
+        action_gt.append(3)
     else:
         if (local_vals[1] < 2.0) or (local_vals[2] < -1.0):
             action_gt.append(1)
         else:
             action_gt.append(0)
-    amax_pred = np.argmax(local_vals[-5:])
+    amax_pred = np.argmax(local_vals[-6:])
     if amax_pred >= 4:
         action_pred.append(amax_pred - 2)
     else:
@@ -67,7 +66,11 @@ for row in reader:
 action_gt_fin = np.asarray(action_gt[1:])
 action_pred_fin = np.asarray(action_pred[0:-1])
 
-print("--> accuracy on {1}_drive{2}: {:3.3f}".format(date, drive, accuracy_score(action_gt_fin, action_pred_fin)))
+print("--> accuracy on {:}_drive{:}: {:3.3f}".format(date, drive, accuracy_score(action_gt_fin, action_pred_fin)))
+cm = confusion_matrix(action_gt_fin, action_pred_fin)
+cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+print("--> confusion matrix...")
+print(cm)
 
 
 

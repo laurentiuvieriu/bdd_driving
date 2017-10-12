@@ -9,12 +9,12 @@ from rv_utils import rv_imgCropCenter, create_local_row_kitti
 
 print("--> opencv version: " + cv2.__version__)
 
-basedir = '/media/radu/sdb_data/radu/work/datasets/Kitti'
-targetDir = '/media/radu/sdb_data/radu/work/python/bdd_driving/results/kitti'
+basedir = '/media/radu/data/datasets/Kitti'
+targetDir = '/media/radu/data/python/bdd_driving/results/kitti'
 
 # Specify the dataset to load
-date = '2011_09_30'
-drive = '0028'
+date = '2011_09_26'
+drive = '0029'
 dataset = pykitti.raw(basedir, date, drive, imformat='cv2')
 font = cv2.FONT_HERSHEY_SIMPLEX
 font_size = 0.5
@@ -101,9 +101,9 @@ for k in range(noFrames):
     plot_bar_on_img(img_crop, slight_right_pred, rect_center_x, row_pos_local, rect_width, 'slight left/right_pred:', font, font_size, font_thickness)
     
     cv2.imshow('image', img_crop)
-    cv2.moveWindow('image', 2500, 360)
+    cv2.moveWindow('image', 2300, 360)
     cv2.waitKey(30)
-    cv2.imwrite(targetDir+"/" + date + "_drive_" + drive + "_sync_full/frame_{:010d}.png".format(k), img_crop)
+    #cv2.imwrite(targetDir+"/" + date + "_drive_" + drive + "_sync_full/frame_{:010d}.png".format(k), img_crop)
 
 # line = next(reader)
 

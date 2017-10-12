@@ -17,8 +17,8 @@ basedir = '/media/radu/data/datasets/Kitti'
 targetDir = '/media/radu/data/python/bdd_driving/results/kitti'
 
 # Specify the dataset to load
-date = '2011_09_30'
-drive = '0028'
+date = '2011_09_26'
+drive = '0029'
 dataset = pykitti.raw(basedir, date, drive, imformat='cv2')
 cvfont = cv2.FONT_HERSHEY_SIMPLEX
 cvfont_size = 0.5
@@ -44,7 +44,7 @@ action_map = {-1:'not_sure', 0:'straight', 1:'slow_or_stop',
                         4:'turn_left_slight', 5:'turn_right_slight'}
 
 
-fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync_3Hz.csv", 'wb')
+fid = open(targetDir + "/" + date + "_drive_" + drive + "_sync_full.csv", 'wb')
 writer = csv.writer(fid, delimiter=',')
 
 csv_header = ('img_idx', 'vf (m/s)', 'af (m/s^2)', 'wz (deg/s)', 'res0', 'res1', 'res2', 'res3', 'res4', 'res5')
@@ -58,7 +58,7 @@ local_k = []
 
 #for k in range(noFrames):
 
-for k in range(0, noFrames- 3, 3): # read every 3 frames, since in Kitti we have 10 fps
+for k in range(0, noFrames): # read every 3 frames, since in Kitti we have 10 fps
 	#print("--> processing img: {:05d}/{:05d}".format(k, noFrames))
 	img = np.array(next(iter_cam2))
 	img_crop = imresize(rv_imgCropCenter(img, model_input_w, model_input_h), (IMSZ, IMSZ))
@@ -84,8 +84,8 @@ for k in range(0, noFrames- 3, 3): # read every 3 frames, since in Kitti we have
 		batch_oxts = []
 		local_k = []
 		batch_idx = batch_idx+ 1
-	dummy_frame = next(iter_cam2)
-	dummy_frame = next(iter_cam2)
+	#dummy_frame = next(iter_cam2)
+	#dummy_frame = next(iter_cam2)
 
 if len(local_k) > 0:
 	for j in range(batch_size - len(local_k)):

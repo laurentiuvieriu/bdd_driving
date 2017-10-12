@@ -21,7 +21,6 @@ import numpy as np
 import csv
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-
 targetDir = '/media/radu/sdb_data/radu/work/python/bdd_driving/results/kitti'
 # Specify the dataset to load
 date = '2011_09_26'

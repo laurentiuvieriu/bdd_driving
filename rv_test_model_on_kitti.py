@@ -1,13 +1,35 @@
-import wrapper
-import tensorflow as tf
-from tensorflow.core.example import example_pb2
-from cStringIO import StringIO
-from PIL import Image
-from matplotlib.pyplot import imshow
-%matplotlib inline
-import numpy as np
+## unzip kitti one archive at a time, compute the predictions and delete the images after that
+## this approach should limit the space requirements as much as possible_hull
 
-a = wrapper.Wrapper("discrete_tcnn1", 
-            "/data/yang/code/BDD_Driving_Model/data/discrete_tcnn1/model.ckpt-126001.bestmodel",
-            20)
+import os
+from rv_utils import rv_fcn_lstm_kitti
+datasetDir = '/media/radu/sdb_data/radu/work/datasets/Kitti'
+projDir = '/media/radu/sdb_data/radu/work/python/bdd_driving'
+
+fileList = [f for f in os.listdir(datasetDir) if f.endswith('sync.zip')]
+print("--> found: {:03} files".format(len(fileList)))
+
+k = 1
+comm = []
+comm.append("unzip -oq {:}/{:} -d {:}/".format(datasetDir, fileList[k], datasetDir))
+print("--> executing: {:}".format(comm[-1]))
+os.system(comm[-1])
+print("--> done... now running the model ...")
+
+date = fileList[k][0:10]
+drive = fileList[k][17:21]
+
+model = rv_fcn_lstm_kitti(datasetDir, projDir)
+model.process_KittiSequence(date, drive)
+
+comm.append("rm -rf {:}/{:}/{:}".format(datasetDir, date, fileList[k][0:-4]))
+print("--> executing: {:}".format(comm[-1]))
+os.system(comm[-1])
+print("--> done")
+
+# comm.append("/home/radu/local/tensorflow_011/bin/python rv_evaluate_results_kitti.py")
+# print("--> executing: {:}".format(comm[-1]))
+# os.system(comm[-1])
+# print("--> done")
+
 

@@ -9,7 +9,7 @@ import tensorflow as tf
 FLAGS = tf.app.flags.FLAGS
 
 ############################Set those path before use###################################
-FLAGS.pretrained_model_path = "/media/radu/data/python/BDD_Driving_Model/models/tf.caffenet.bin"
+FLAGS.pretrained_model_path = "/media/radu/sdb_data/radu/work/python/BDD_Driving_Model/models/tf.caffenet.bin"
 FLAGS.data_dir = "/media/radu/data/python/BDD_Driving_Model/tfrecords"
 
 # for privilege training: segmentation image index and labels

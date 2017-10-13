@@ -21,17 +21,19 @@ import os
 import numpy as np
 import csv
 from sklearn.metrics import accuracy_score, confusion_matrix
+from matplotlib import pyplot as plt
 
 resultsDir = '/media/radu/data/python/bdd_driving/results/kitti/fcn_lstm'
 # Specify the dataset to load
-date = '2011_09_26'
+# date = '2011_09_26'
 
 files = [f for f in os.listdir(resultsDir) if f.endswith('full.csv')]
 print("--> found {:d} results files".format(len(files)))
 
 all_drives = [item[17:21] for item in files]
+all_dates = [item[0:10] for item in files]
 
-def get_labelsFromFile(date, drive):
+def get_labelsFromFile(date, drive, wz_th=1):
 	fid = open(resultsDir + "/" + date + "_drive_" + drive + "_sync_full.csv", "rb")
 	reader = csv.reader(fid, delimiter=',')
 	# csv_header = ('img_idx', 'vf (m/s)', 'af (m/s^2)', 'wz (deg/s)', 'res0', 'res1', 'res2', 'res3', 'res4', 'res5')
@@ -50,9 +52,9 @@ def get_labelsFromFile(date, drive):
 	action_pred = []
 	for row in reader:
 		local_vals = [float(item) for item in row]
-		if local_vals[3] > 1.0:
+		if local_vals[3] > wz_th:
 		    action_gt.append(2)
-		elif local_vals[3] < -1.0:
+		elif local_vals[3] < -wz_th:
 		    action_gt.append(3)
 		else:
 		    if (local_vals[1] < 2.0) or (local_vals[2] < -1.0):
@@ -69,20 +71,45 @@ def get_labelsFromFile(date, drive):
 	action_pred_fin = np.asarray(action_pred[0:-1])	
 	return [action_gt_fin, action_pred_fin]
 
-all_acc = []
-all_labs_gt = []
-all_labs_pred = []
-for drive in all_drives:
-	labs = get_labelsFromFile(date, drive)
-	all_labs_gt.append(labs[0])
-	all_labs_pred.append(labs[1])
-	all_acc.append(accuracy_score(labs[0], labs[1]))
-	print("--> accuracy on {:}_drive{:}: {:3.3f}".format(date, drive, accuracy_score(labs[0], labs[1])))
 
+acc_seq_grid = []
+acc_frame_grid = []
+cm_frame_grid = []
 
-print("---> avg seq-level accuracy: {:.2f}".format(np.mean(np.stack(all_acc))))
-print("---> avg frame-level accuracy: {:.2f}".format(accuracy_score(np.hstack(all_labs_gt), np.hstack(all_labs_pred))))
+for wz_th in range(1,21,1):
+	all_acc = []
+	all_labs_gt = []
+	all_labs_pred = []
+	for date, drive in zip(all_dates, all_drives):
+		labs = get_labelsFromFile(date, drive, wz_th)
+		all_labs_gt.append(labs[0])
+		all_labs_pred.append(labs[1])
+		all_acc.append(accuracy_score(labs[0], labs[1]))
+		#print("--> accuracy on {:}_drive{:}: {:3.3f}".format(date, drive, accuracy_score(labs[0], labs[1])))
+	print("---> angle th: {:02d} - avg seq-level accuracy: {:.2f}".format(wz_th, np.mean(np.stack(all_acc))))
+	print("---> angle th: {:02d} - avg frame-level accuracy: {:.2f}".format(wz_th, accuracy_score(np.hstack(all_labs_gt), np.hstack(all_labs_pred))))
+	acc_seq_grid.append(np.mean(np.stack(all_acc)))
+	acc_frame_grid.append(accuracy_score(np.hstack(all_labs_gt), np.hstack(all_labs_pred)))
+	cm_frame_grid.append(confusion_matrix(np.hstack(all_labs_gt), np.hstack(all_labs_pred)))
+	cm_frame_grid[-1] = cm_frame_grid[-1].astype('float') / cm_frame_grid[-1].sum(axis=1)[:, np.newaxis]
+	#cm = confusion_matrix(labs[0], labs[1])
+	#m = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+	#print("--> confusion matrix...")
+	#print(cm)
 
+x = range(1,21,1)
+
+plt.plot(x, np.hstack(acc_seq_grid), color="red", linewidth=2.0, label="acc_sequence_based")
+plt.plot(x, np.hstack(acc_frame_grid), color="blue", linewidth=2.0, label="acc_frame_based")
+
+plt.grid(True)
+
+plt.xlabel('rot. acceleration threshold')
+plt.ylabel('4 class accuracy')
+plt.title('fcn_lstm accuracy on kitti')
+
+plt.legend(loc='upper left')
+plt.show()
 
 #cm = confusion_matrix(labs[0], labs[1])
 #cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]

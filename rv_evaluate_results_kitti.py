@@ -111,6 +111,8 @@ plt.title('fcn_lstm accuracy on kitti')
 plt.legend(loc='upper left')
 plt.show()
 
+np.set
+
 #cm = confusion_matrix(labs[0], labs[1])
 #cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 #print("--> confusion matrix...")

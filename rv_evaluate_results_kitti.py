@@ -23,7 +23,7 @@ import csv
 from sklearn.metrics import accuracy_score, confusion_matrix
 from matplotlib import pyplot as plt
 
-resultsDir = '/media/radu/data/python/bdd_driving/results/kitti/fcn_lstm'
+resultsDir = '/data/radu/python/bdd_driving/results/kitti/fcn_lstm'
 # Specify the dataset to load
 # date = '2011_09_26'
 
@@ -111,7 +111,7 @@ plt.title('fcn_lstm accuracy on kitti')
 plt.legend(loc='upper left')
 plt.show()
 
-np.set
+#np.set
 
 #cm = confusion_matrix(labs[0], labs[1])
 #cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
